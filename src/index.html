@@ -1,0 +1,58 @@
+<html>
+<head>
+  <script src="bundle.js"></script>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <div id="container">
+    <canvas id="myCanvas" width="800" height="800"></canvas>
+    <div id="overlay">
+      <div class="title">
+        NYAN CAT
+      </div>
+      <div class="gameOver" id=gameOver>
+        GAME OVER
+      </div>
+      <br />
+      <div class="button" onclick="startGame()">
+        Start Game
+      </div>
+      <input class="slider" id="defaultSlider" type="range" min="1" max="5" value="1"/>
+      <div class="score">
+        <div class="button" style="width:280px" id="button1">
+          Time: XX.Xs
+        </div>
+        <div class="button" style="width:240px" id="button2">
+          High Score: XX.Xs
+        </div>
+      </div>
+      <div class="button" onclick="displayStats()">
+        Stats
+      </div>
+    </div>
+    <div id="statsOverlay">
+      <div class="title">
+        NYAN CAT
+      </div>
+      <br /><br />
+      <div class="button" style="width:400px" id="high">
+        Highscore: XX:XXs
+      </div>
+      <div class="button" style="width:400px" id="totalA">
+        Total attemps: XXX
+      </div>
+      <div class="button" style="width:400px" id="totalT">
+        Total time played: XX:XXs
+      </div>
+      <div class="button" style="width:400px" id="shortest">
+        Shortest Game: XX:XXs
+      </div>
+      <div class="button"  onclick="undisplayStats()">
+        BACK
+      </div>
+    </div>
+</div>
+</div>
+</body>
+
+</html>
