@@ -1,6 +1,17 @@
-// CREATE A VERSION FOR EACH ONE OF THOSE SONGS: https://www.youtube.com/user/10HourWeebl/videos
-// WITH MUSIC AND ICON OF THE ANIMAL!!!
-
+var urlIcon = require("file!./assets/icon.png");
+var urlAsteroid = require("file!./assets/asteroidIcon.png");
+var urlFail1 = require("file!./assets/fail1.m4a");
+var urlFail2 = require("file!./assets/fail2.m4a");
+var urlFail3 = require("file!./assets/fail3.m4a");
+var urlFail4 = require("file!./assets/fail4.m4a");
+var urlFail5 = require("file!./assets/fail5.m4a");
+var urlFail6 = require("file!./assets/fail6.m4a");
+var urlFail7 = require("file!./assets/fail7.m4a");
+var urlFail8 = require("file!./assets/fail8.m4a");
+var urlFail9 = require("file!./assets/fail9.m4a");
+var urlMusic = require("file!./assets/nyan.m4a");
+var urlLaser = require("file!./assets/laser.m4a");
+console.log(urlIcon);
 
 'use strict';
 var moment = require('moment'),
@@ -30,23 +41,23 @@ if (localStorage.getItem('localShortestGame')){var shortestGame = parseInt(local
 
 var resources = new GameResources({
   images: {
-    asteroid: 'assets/asteroidIcon.png',
-    ship: 'assets/icon.png'
+    asteroid: urlAsteroid,
+    ship: urlIcon
   },
   sounds: {
-    music: 'assets/nyan.m4a',
-    laser: 'assets/laser.m4a',
+    music: urlMusic,
+    laser: urlLaser,
   },
   fails : {
-    fail1: 'assets/fail1.m4a',
-    fail2: 'assets/fail2.m4a',
-    fail3: 'assets/fail3.m4a',
-    fail4: 'assets/fail4.m4a',
-    fail5: 'assets/fail5.m4a',
-    fail6: 'assets/fail6.m4a',
-    fail7: 'assets/fail7.m4a',
-    fail8: 'assets/fail8.m4a',
-    fail9: 'assets/fail9.m4a'
+    fail1: urlFail1,
+    fail2: urlFail2,
+    fail3: urlFail3,
+    fail4: urlFail4,
+    fail5: urlFail5,
+    fail6: urlFail6,
+    fail7: urlFail7,
+    fail8: urlFail8,
+    fail9: urlFail9
   }
 });
 
