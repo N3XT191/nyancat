@@ -3,7 +3,7 @@ var BoundingBox = require('./boundingBox'),
   Ship = require('./ship'),
   moment = require('moment');
 class GameState {
-  constructor (boundingBoxStart, boundingBoxEnd){
+  constructor (boundingBoxStart, boundingBoxEnd, difficulty){
     this.boundingBox = new BoundingBox(boundingBoxStart, boundingBoxEnd);
     this.ship = new Ship(200,200, this.boundingBox);
     this.obstacles = [];
@@ -11,6 +11,7 @@ class GameState {
     this.trail = [];
     this.beginTime = moment();
     this.shootsLeft = 3;
+    this.difficulty = difficulty;
   }
   cleanse() {
     for (var i = 0; i < this.trail.length; i++){

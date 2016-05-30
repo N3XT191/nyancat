@@ -9,29 +9,48 @@ BoundingBox = require('./boundingBox'),
 Obstacle = require('./obstacle'),
 TraceElement = require('./traceElement'),
 GameState = require('./gameState'),
-Projectile = require('./projectile');
+Projectile = require('./projectile'),
+GameResources = require('./gameResources');
+
 var context2D, canvas;
 var gameSpeed = 1;
 var lastFrame = moment();
 var lastShot = moment();
 var lastAddedProjectile = moment();
 var colorArray = ["red", "orange", "yellow", "green", "blue"];
-var audio = new Audio('assets/nyan.m4a');
-var secondAudio = new Audio('assets/yackety.m4a');
-var laserAudio = new Audio('assets/laser.m4a');
-var failAudio = [new Audio('assets/fail1.m4a'), new Audio('assets/fail2.m4a'), new Audio('assets/fail3.m4a'), new Audio('assets/fail4.m4a'), new Audio('assets/fail5.m4a'), new Audio('assets/fail6.m4a'), new Audio('assets/fail7.m4a'), new Audio('assets/fail8.m4a'), new Audio('assets/fail9.m4a'),]
 var canvas, context2D;
 var keys = {};
 var listener;
 var gameState;
-var difficulty;
 if (localStorage.getItem('localHighScore')){var highScore = parseInt(localStorage.getItem('localHighScore'));} else {  var highScore = 0;}
 if (localStorage.getItem('localTotalAttemps')){var totalAttemps = parseInt(localStorage.getItem('localTotalAttemps'));} else {  var totalAttemps = 0;}
 if (localStorage.getItem('localTotalTime')){var totalTime = parseInt(localStorage.getItem('localTotalTime'));} else {  var totalTime = 0;}
 if (localStorage.getItem('localShortestGame')){var shortestGame = parseInt(localStorage.getItem('localShortestGame'));} else {  var shortestGame = -1;}
 
-var shipIcon, asteroidIcon;
 
+var resources = new GameResources({
+  images: {
+    asteroid: 'assets/asteroidIcon.png',
+    ship: 'assets/icon.png'
+  },
+  sounds: {
+    music: 'assets/nyan.m4a',
+    laser: 'assets/laser.m4a',
+  },
+  fails : {
+    fail1: 'assets/fail1.m4a',
+    fail2: 'assets/fail2.m4a',
+    fail3: 'assets/fail3.m4a',
+    fail4: 'assets/fail4.m4a',
+    fail5: 'assets/fail5.m4a',
+    fail6: 'assets/fail6.m4a',
+    fail7: 'assets/fail7.m4a',
+    fail8: 'assets/fail8.m4a',
+    fail9: 'assets/fail9.m4a'
+  }
+});
+
+var resourcesLoaded = resources.load();
 
 document.addEventListener('DOMContentLoaded', function() {
   canvas = document.getElementById("myCanvas");
@@ -48,16 +67,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function startGame(){
-  loadResources().then(function() {
+  resourcesLoaded.then(function() {
     var difficultyElement = document.getElementById('defaultSlider');
-    difficulty = difficultyElement.value;
-    gameSpeed = 0.8 + 0.2 * difficulty;
-
     var overlay = document.getElementById('overlay');
     overlay.style.display = 'none';
-    gameState =  new GameState([0,0], [801,801]);
-    audio.load();
-    audio.play();
+    gameState =  new GameState([0,0], [801,801], difficultyElement.value);
+    gameSpeed = 0.8 + 0.2 * gameState.difficulty;
+    resources.sounds.music.load();
+    resources.sounds.music.play();
     listener = setInterval(function(){
       drawCanvas();
       gameTick();
@@ -83,10 +100,12 @@ function gameOver(){
 
 
 
-  audio.pause();
-  audio.load();
-  secondAudio.pause();
-  failAudio[Math.floor(Math.random()*9)].play();
+  resources.sounds.music.pause();
+  resources.sounds.music.load();
+  var keys = Object.keys(resources.fails);
+  var randomSound =  resources.fails[keys[keys.length*Math.random() << 0]];
+  console.log(randomSound);
+  randomSound.play();
   clearInterval(listener);
   var score = Math.floor((moment()-gameState.beginTime)/10)/100;
   if (score > highScore){
@@ -119,12 +138,7 @@ function gameOver(){
 
 }
 function drawCanvas(){
-  /*asteroidIcon.src = '/assets/asteroidIcon.png';
-  asteroidIcon.onload = function() {
-    context2D.drawImage(asteroidIcon, 300, 200);
-    context2D.drawImage(asteroidIcon, 500, 200);
-  };
-  return;*/
+
   var rgb1 = makeColorGradient(0.6,0.6,0.6, 0,2,4, (moment()-gameState.beginTime)/1000);
   var rgb2 = makeColorGradient(0.6,0.6,0.6, 0,2,4, (moment()-gameState.beginTime+1000)/1000);
 
@@ -144,7 +158,7 @@ function drawCanvas(){
 
     context2D.fillStyle = "white";
   for(var i = 0; i < gameState.obstacles.length; i++) {
-    context2D.drawImage(asteroidIcon, gameState.obstacles[i].position[0], gameState.obstacles[i].position[1]);
+    context2D.drawImage(resources.images.asteroid, gameState.obstacles[i].position[0], gameState.obstacles[i].position[1]);
   }
   for(var i = 0; i < gameState.projectiles.length; i++) {
     context2D.fillStyle = gameState.projectiles[i].color;
@@ -170,7 +184,7 @@ function drawCanvas(){
     context2D.fillStyle = colorArray[4];
     context2D.fillRect(gameState.trail[i].position[0]+5, gameState.trail[i].position[1]+16, 6, 4);
   }
-  context2D.drawImage(shipIcon, Math.round(gameState.ship.position[0]-5), Math.round(gameState.ship.position[1])-5);
+  context2D.drawImage(resources.images.ship, Math.round(gameState.ship.position[0]-5), Math.round(gameState.ship.position[1])-5);
 
 }
 
@@ -242,19 +256,19 @@ function checkCollisionProjectiles(){
   }
 }
 function addObstacle(){
-  gameState.obstacles.push(new Obstacle(800,Math.random()*(20000-7000*Math.sqrt(difficulty))));
-  gameState.obstacles.push(new Obstacle(800,Math.random()*(20000-7000*Math.sqrt(difficulty))));
+  gameState.obstacles.push(new Obstacle(800,Math.random()*(15000-6000*Math.sqrt(gameState.difficulty))));
+  gameState.obstacles.push(new Obstacle(800,Math.random()*(15000-6000*Math.sqrt(gameState.difficulty))));
 }
 function restart(){
 
 }
 function shoot(){
   gameState.projectiles.push(new Projectile(gameState.ship.position[0],gameState.ship.position[1]+10, colorArray[Math.floor(Math.random()*5)]));
-  laserAudio.play();
+  resources.sounds.laser.play();
 }
 
 function addProjectile(){
-  if(moment() - lastAddedProjectile > Math.floor((2000/gameSpeed)+3000*(difficulty-1))){
+  if(moment() - lastAddedProjectile > Math.floor((2000/gameSpeed)+1500*(gameState.difficulty-1))){
     gameState.addShoot(+1);
     lastAddedProjectile = moment();
   }
@@ -316,23 +330,6 @@ function makeColorGradient(frequency1, frequency2, frequency3,
       document.webkitExitFullscreen();
     }
   }
-}
-
-function loadResources(){
-  return Promise.all([
-    loadImagePromise('/assets/icon.png').then(icon => shipIcon = icon),
-    loadImagePromise('/assets/asteroidIcon.png').then(icon => asteroidIcon = icon)
-  ]);
-}
-
-function loadImagePromise(url){
-  var image = new Image();
-  return new Promise(function(resolve) {
-    image.onload = function(){
-      resolve(image);
-    };
-    image.src = url;
-  });
 }
 
 function writeStats(){
